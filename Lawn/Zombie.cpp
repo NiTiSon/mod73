@@ -164,7 +164,7 @@ void Zombie::ZombieInitialize(int theRow, ZombieType theType, bool theVariant, Z
         mPosX += 40.0f;
     }
     PickRandomSpeed();
-    mBodyHealth = 270;
+    mBodyHealth = 300;
 
     const ZombieDefinition& aZombieDef = GetZombieDefinition(mZombieType);
     RenderLayer aRenderLayer = RenderLayer::RENDER_LAYER_ZOMBIE;
@@ -509,6 +509,7 @@ void Zombie::ZombieInitialize(int theRow, ZombieType theType, bool theVariant, Z
 
     case ZombieType::ZOMBIE_FLAG:  //0x5231E8
     {
+        mBodyHealth = 2000;
         mHasObject = true;
         LoadPlainZombieReanim();
 
@@ -1130,20 +1131,22 @@ void Zombie::PickRandomSpeed()
     else if (mZombiePhase == ZombiePhase::PHASE_DIGGER_TUNNELING || mZombiePhase == ZombiePhase::PHASE_POLEVAULTER_PRE_VAULT || 
         mZombieType == ZombieType::ZOMBIE_FOOTBALL || mZombieType == ZombieType::ZOMBIE_SNORKEL || mZombieType == ZombieType::ZOMBIE_JACK_IN_THE_BOX)
     {
-        mVelX = RandRangeFloat(0.66f, 0.68f);
+        mVelX = 0.67f /*RandRangeFloat(0.66f, 0.68f)*/;
     }
     else if (mZombiePhase == ZombiePhase::PHASE_LADDER_CARRYING || mZombieType == ZombieType::ZOMBIE_SQUASH_HEAD)
     {
-        mVelX = RandRangeFloat(0.79f, 0.81f);
+        mVelX = 0.80f /*RandRangeFloat(0.79f, 0.81f)*/;
     }
     else if (mZombiePhase == ZombiePhase::PHASE_NEWSPAPER_MAD || mZombiePhase == ZombiePhase::PHASE_DOLPHIN_WALKING || 
         mZombiePhase == ZombiePhase::PHASE_DOLPHIN_WALKING_WITHOUT_DOLPHIN)
     {
-        mVelX = RandRangeFloat(0.89f, 0.91f);
+        mVelX = 0.90f /*RandRangeFloat(0.89f, 0.91f)*/;
     }
     else
     {
-        mVelX = RandRangeFloat(0.23f, 0.32f);
+        mVelX = 0.27f;
+        mAnimTicksPerFrame = 13;
+        /*mVelX = RandRangeFloat(0.23f, 0.32f);
         if (mVelX < 0.3f)
         {
             mAnimTicksPerFrame = 12;
@@ -1151,7 +1154,7 @@ void Zombie::PickRandomSpeed()
         else
         {
             mAnimTicksPerFrame = 15;
-        }
+        }*/
     }
 
     UpdateAnimSpeed();
@@ -8626,15 +8629,14 @@ void Zombie::RemoveColdEffects()
     }
 }
 
-//0x532B70
-void Zombie::ApplyBurn()
+void Zombie::ApplyBurnDamage(int damage)
 {
     if (mDead || mZombiePhase == ZombiePhase::PHASE_ZOMBIE_BURNED)
         return;
 
-    if (mBodyHealth >= 1800 || mZombieType == ZombieType::ZOMBIE_BOSS)
+    if (mBodyHealth >= damage || mZombieType == ZombieType::ZOMBIE_BOSS)
     {
-        TakeDamage(1800, 18U);
+        TakeDamage(damage, 18U);
         return;
     }
 
@@ -8656,20 +8658,20 @@ void Zombie::ApplyBurn()
     AttachmentDetachCrossFadeParticleType(mAttachmentID, ParticleEffect::PARTICLE_ZAMBONI_SMOKE, nullptr);
     BungeeDropPlant();
 
-    if (mZombiePhase == ZombiePhase::PHASE_ZOMBIE_DYING || 
-        mZombiePhase == ZombiePhase::PHASE_POLEVAULTER_IN_VAULT || 
-        mZombiePhase == ZombiePhase::PHASE_IMP_GETTING_THROWN || 
-        mZombiePhase == ZombiePhase::PHASE_RISING_FROM_GRAVE || 
-        mZombiePhase == ZombiePhase::PHASE_DANCER_RISING || 
-        mZombiePhase == ZombiePhase::PHASE_DOLPHIN_INTO_POOL || 
-        mZombiePhase == ZombiePhase::PHASE_DOLPHIN_IN_JUMP || 
-        mZombiePhase == ZombiePhase::PHASE_DOLPHIN_RIDING || 
-        mZombiePhase == ZombiePhase::PHASE_SNORKEL_INTO_POOL || 
-        mZombiePhase == ZombiePhase::PHASE_DIGGER_TUNNELING || 
-        mZombiePhase == ZombiePhase::PHASE_DIGGER_TUNNELING_PAUSE_WITHOUT_AXE || 
-        mZombiePhase == ZombiePhase::PHASE_DIGGER_RISING || 
-        mZombiePhase == ZombiePhase::PHASE_DIGGER_RISE_WITHOUT_AXE || 
-        mZombiePhase == ZombiePhase::PHASE_ZOMBIE_MOWERED || 
+    if (mZombiePhase == ZombiePhase::PHASE_ZOMBIE_DYING ||
+        mZombiePhase == ZombiePhase::PHASE_POLEVAULTER_IN_VAULT ||
+        mZombiePhase == ZombiePhase::PHASE_IMP_GETTING_THROWN ||
+        mZombiePhase == ZombiePhase::PHASE_RISING_FROM_GRAVE ||
+        mZombiePhase == ZombiePhase::PHASE_DANCER_RISING ||
+        mZombiePhase == ZombiePhase::PHASE_DOLPHIN_INTO_POOL ||
+        mZombiePhase == ZombiePhase::PHASE_DOLPHIN_IN_JUMP ||
+        mZombiePhase == ZombiePhase::PHASE_DOLPHIN_RIDING ||
+        mZombiePhase == ZombiePhase::PHASE_SNORKEL_INTO_POOL ||
+        mZombiePhase == ZombiePhase::PHASE_DIGGER_TUNNELING ||
+        mZombiePhase == ZombiePhase::PHASE_DIGGER_TUNNELING_PAUSE_WITHOUT_AXE ||
+        mZombiePhase == ZombiePhase::PHASE_DIGGER_RISING ||
+        mZombiePhase == ZombiePhase::PHASE_DIGGER_RISE_WITHOUT_AXE ||
+        mZombiePhase == ZombiePhase::PHASE_ZOMBIE_MOWERED ||
         mInPool)
     {
         DieWithLoot();
@@ -8677,7 +8679,7 @@ void Zombie::ApplyBurn()
     else if (mZombieType == ZOMBIE_BUNGEE || mZombieType == ZOMBIE_YETI || Zombie::IsZombotany(mZombieType) || IsBobsledTeamWithSled() || IsFlying() || !mHasHead)
     {
         SetAnimRate(0.0f);
-        Reanimation* aHeadReanim = mApp->ReanimationTryToGet(mSpecialHeadReanimID);
+        Reanimation *aHeadReanim = mApp->ReanimationTryToGet(mSpecialHeadReanimID);
         if (aHeadReanim)
         {
             aHeadReanim->mAnimRate = 0.0f;
@@ -8734,7 +8736,7 @@ void Zombie::ApplyBurn()
             aCharredPosY -= 10.0f;
         }
 
-        Reanimation* aCharredReanim = mApp->AddReanimation(aCharredPosX, aCharredPosY, mRenderOrder, aReanimType);
+        Reanimation *aCharredReanim = mApp->AddReanimation(aCharredPosX, aCharredPosY, mRenderOrder, aReanimType);
         aCharredReanim->mAnimRate *= RandRangeFloat(0.9f, 1.1f);
         if (mZombiePhase == ZombiePhase::PHASE_DIGGER_WALKING_WITHOUT_AXE)
         {
@@ -8772,6 +8774,12 @@ void Zombie::ApplyBurn()
     {
         BobsledBurn();
     }
+}
+
+//0x532B70
+void Zombie::ApplyBurn()
+{
+    ApplyBurnDamage(1800);
 }
 
 //0x533000
