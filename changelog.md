@@ -1,3 +1,9 @@
+# 0.0.2 Changes:
+
+## Gameplay
++ Seed Bank
+	+ QoL: By pressing keys 1..9 you can select plants from seed bank
+
 # 0.0.1 Changes:
 
 ## Plants:
