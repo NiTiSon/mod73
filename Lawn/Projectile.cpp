@@ -818,7 +818,17 @@ void Projectile::DoImpact(Zombie* theZombie)
 	else if (theZombie)
 	{
 		unsigned int aDamageFlags = GetDamageFlags(theZombie);
-		theZombie->TakeDamage(GetProjectileDef().mDamage, aDamageFlags);
+
+		int aDamage = GetProjectileDef().mDamage;
+
+		/* Increase damage when only one zombie on line
+		if (mProjectileType == ProjectileType::PROJECTILE_PEA && mBoard->CountZombiesOnLine(mRow) == 1)
+		{
+			aDamage *= 10000;
+		}
+		*/
+
+		theZombie->TakeDamage(aDamage, aDamageFlags);
 	}
 
 	float aLastPosX = mPosX - mVelX;
