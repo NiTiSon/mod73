@@ -22,13 +22,13 @@
 #include "../Sexy.TodLib/TodStringFile.h"
 
 PlantDefinition gPlantDefs[SeedType::NUM_SEED_TYPES] = {  //0x69F2B0
-    { SeedType::SEED_PEASHOOTER,        nullptr, ReanimationType::REANIM_PEASHOOTER,    0,  100,    750,    PlantSubClass::SUBCLASS_SHOOTER,    150,    _S("PEASHOOTER") },
-    { SeedType::SEED_SUNFLOWER,         nullptr, ReanimationType::REANIM_SUNFLOWER,     1,  50,     750,    PlantSubClass::SUBCLASS_NORMAL,     2500,   _S("SUNFLOWER") },
-    { SeedType::SEED_CHERRYBOMB,        nullptr, ReanimationType::REANIM_CHERRYBOMB,    3,  150,    5000,   PlantSubClass::SUBCLASS_NORMAL,     0,      _S("CHERRY_BOMB") },
+    { SeedType::SEED_PEASHOOTER,        nullptr, ReanimationType::REANIM_PEASHOOTER,    0,  75,     750,    PlantSubClass::SUBCLASS_SHOOTER,    150,    _S("PEASHOOTER") },
+    { SeedType::SEED_SUNFLOWER,         nullptr, ReanimationType::REANIM_SUNFLOWER,     1,  75,     750,    PlantSubClass::SUBCLASS_NORMAL,     2500,   _S("SUNFLOWER") },
+    { SeedType::SEED_CHERRYBOMB,        nullptr, ReanimationType::REANIM_CHERRYBOMB,    3,  325,    4000,   PlantSubClass::SUBCLASS_NORMAL,     0,      _S("CHERRY_BOMB") },
     { SeedType::SEED_WALLNUT,           nullptr, ReanimationType::REANIM_WALLNUT,       2,  50,     3000,   PlantSubClass::SUBCLASS_NORMAL,     0,      _S("WALL_NUT") },
-    { SeedType::SEED_POTATOMINE,        nullptr, ReanimationType::REANIM_POTATOMINE,    37, 25,     3000,   PlantSubClass::SUBCLASS_NORMAL,     0,      _S("POTATO_MINE") },
+    { SeedType::SEED_POTATOMINE,        nullptr, ReanimationType::REANIM_POTATOMINE,    37, 75,     2000,   PlantSubClass::SUBCLASS_NORMAL,     0,      _S("POTATO_MINE") },
     { SeedType::SEED_SNOWPEA,           nullptr, ReanimationType::REANIM_SNOWPEA,       4,  175,    750,    PlantSubClass::SUBCLASS_SHOOTER,    150,    _S("SNOW_PEA") },
-    { SeedType::SEED_CHOMPER,           nullptr, ReanimationType::REANIM_CHOMPER,       31, 150,    750,    PlantSubClass::SUBCLASS_NORMAL,     0,      _S("CHOMPER") },
+    { SeedType::SEED_CHOMPER,           nullptr, ReanimationType::REANIM_CHOMPER,       31, 175,    750,    PlantSubClass::SUBCLASS_NORMAL,     0,      _S("CHOMPER") },
     { SeedType::SEED_REPEATER,          nullptr, ReanimationType::REANIM_REPEATER,      5,  200,    750,    PlantSubClass::SUBCLASS_SHOOTER,    150,    _S("REPEATER") },
     { SeedType::SEED_PUFFSHROOM,        nullptr, ReanimationType::REANIM_PUFFSHROOM,    6,  0,      750,    PlantSubClass::SUBCLASS_SHOOTER,    150,    _S("PUFF_SHROOM") },
     { SeedType::SEED_SUNSHROOM,         nullptr, ReanimationType::REANIM_SUNSHROOM,     7,  25,     750,    PlantSubClass::SUBCLASS_NORMAL,     2500,   _S("SUN_SHROOM") },
@@ -739,7 +739,18 @@ bool Plant::FindTargetAndFire(int theRow, PlantWeapon thePlantWeapon)
         aHeadReanim->SetFramesForLayer("anim_shooting");
 
         mShootingCounter = 33;
-        if (mSeedType == SeedType::SEED_REPEATER || mSeedType == SeedType::SEED_SPLITPEA || mSeedType == SeedType::SEED_LEFTPEATER)
+        if (mSeedType == SeedType::SEED_PEASHOOTER)
+        {
+            int aLineZombiesCount = mBoard->CountZombiesOnLine(mRow);
+
+            // Increase peashooter speed when on line 3 or more zombies
+            if (aLineZombiesCount >= 3)
+            {
+                mShootingCounter *= 0.75f;
+                aHeadReanim->mAnimRate *=  (1 / 0.75f);
+            }
+        }
+        else if (mSeedType == SeedType::SEED_REPEATER || mSeedType == SeedType::SEED_SPLITPEA || mSeedType == SeedType::SEED_LEFTPEATER)
         {
             aHeadReanim->mAnimRate = 45.0f;
             mShootingCounter = 26;
@@ -1036,7 +1047,14 @@ void Plant::UpdateProductionPlant()
         }
         else if (mSeedType == SeedType::SEED_SUNFLOWER)
         {
-            mBoard->AddCoin(mX, mY, CoinType::COIN_SUN, CoinMotion::COIN_MOTION_FROM_PLANT);
+            int aRandom = RandRangeInt(1, 8); // 12.5% to drop 50 sun instead of 25
+            CoinType aCoinType;
+            if (aRandom == 1)
+                aCoinType = CoinType::COIN_LARGESUN;
+            else
+                aCoinType = CoinType::COIN_SUN;
+
+            mBoard->AddCoin(mX, mY, aCoinType, CoinMotion::COIN_MOTION_FROM_PLANT);
         }
         else if (mSeedType == SeedType::SEED_TWINSUNFLOWER)
         {
@@ -1827,7 +1845,7 @@ void Plant::UpdateChomper()
             }
 
             mState = PlantState::STATE_CHOMPER_DIGESTING;
-            mStateCountdown = 4000;
+            mStateCountdown = 2000;
         }
     }
     else if (mState == PlantState::STATE_CHOMPER_DIGESTING)
@@ -4353,7 +4371,7 @@ void Plant::DoSpecial()
         mApp->PlayFoley(FoleyType::FOLEY_CHERRYBOMB);
         mApp->PlayFoley(FoleyType::FOLEY_JUICY);
 
-        mBoard->KillAllZombiesInRadius(mRow, aPosX, aPosY, 115, 1, true, aDamageRangeFlags);
+        mBoard->ApplyDamageOnZombiesInRadius(mRow, aPosX, aPosY, 115, 1, true, 1200, aDamageRangeFlags);
 
         mApp->AddTodParticle(aPosX, aPosY, (int)RenderLayer::RENDER_LAYER_TOP, ParticleEffect::PARTICLE_POWIE);
         mBoard->ShakeBoard(3, -4);
@@ -4416,7 +4434,9 @@ void Plant::DoSpecial()
         aPosY = mY + mHeight / 2;
 
         mApp->PlaySample(SOUND_POTATO_MINE);
-        mBoard->KillAllZombiesInRadius(mRow, aPosX, aPosY, 60, 0, false, aDamageRangeFlags);
+        mBoard->ApplyDamageOnZombiesInRadius(mRow, aPosX, aPosY, 115, 0, false, 200, aDamageRangeFlags);
+        mBoard->ApplyDamageOnZombiesInRadius(mRow, aPosX, aPosY, 60, 0, false, 1200, aDamageRangeFlags);
+        //mBoard->KillAllZombiesInRadius(mRow, aPosX, aPosY, 60, 0, false, aDamageRangeFlags);
 
         int aRenderPosition = Board::MakeRenderOrder(RenderLayer::RENDER_LAYER_PARTICLE, mRow, 0);
         mApp->AddTodParticle(aPosX + 20.0f, aPosY, aRenderPosition, ParticleEffect::PARTICLE_POTATO_MINE);
@@ -4983,6 +5003,17 @@ void Plant::Die()
         {
             aZombie->DieWithLoot();
         }
+    }
+
+    if (IsOnBoard() && mSeedType == SeedType::SEED_SUNFLOWER)
+    {
+        Zombie* aZombie = mBoard->ZombieTryToGet(mTargetZombieID);
+        if (aZombie)
+        {
+            aZombie->TakeDamage(20, 0); // Applies damage to zombie that ate sunflower
+        }
+
+        mBoard->AddCoin(this->mX, this->mY, CoinType::COIN_SUN, CoinMotion::COIN_MOTION_FROM_PLANT); // Drops sun on death
     }
 
     mDead = true;
