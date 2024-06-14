@@ -239,6 +239,20 @@ void BoardInitForPlayer()
 	gShownMoreSunTutorial = false;
 }
 
+int Board::CountZombiesOnLine(int lineNumber)
+{
+	int aCount = 0;
+	Zombie *aZombie = nullptr;
+	while (IterateZombies(aZombie))
+	{
+		if (aZombie->mHasHead && !aZombie->IsDeadOrDying() && !aZombie->mMindControlled && aZombie->IsOnBoard() && aZombie->mRow == lineNumber)
+		{
+			aCount++;
+		}
+	}
+	return aCount;
+}
+
 //0x408A70
 void Board::DisposeBoard()
 {
@@ -573,7 +587,7 @@ void Board::PutInMissingZombies(int theWaveNumber, ZombiePicker* theZombiePicker
 void Board::PickZombieWaves()
 {
 	// ====================================================================================================
-	// ▲ 设定关卡总波数
+	// ▲ Set the total number of waves
 	// ====================================================================================================
 	if (mApp->IsAdventureMode())
 	{
@@ -613,7 +627,7 @@ void Board::PickZombieWaves()
 	}
 
 	// ====================================================================================================
-	// ▲ 一些准备工作
+	// ▲ Some preparation
 	// ====================================================================================================
 	ZombiePicker aZombiePicker;
 	ZombiePickerInit(&aZombiePicker);
@@ -621,7 +635,7 @@ void Board::PickZombieWaves()
 	TOD_ASSERT(mNumWaves <= MAX_ZOMBIE_WAVES);
 
 	// ====================================================================================================
-	// ▲ 遍历每一波并填充每波的出怪列表
+	// ▲ Traverse each wave and fill in the monster list for each wave
 	// ====================================================================================================
 	for (int aWave = 0; aWave < mNumWaves; aWave++)
 	{
@@ -633,7 +647,7 @@ void Board::PickZombieWaves()
 
 		if (mApp->IsBungeeBlitzLevel() && aIsFlagWave)
 		{
-			// 蹦极闪电战关卡的每大波固定刷出 5 只蹦极僵尸
+			// Each wave of the Bungee Blitz level will spawn 5 Bungee Zombies.
 			for (int _i = 0; _i < 5; _i++)
 				PutZombieInWave(ZombieType::ZOMBIE_BUNGEE, aWave, &aZombiePicker);
 
@@ -642,10 +656,10 @@ void Board::PickZombieWaves()
 		}
 
 		// ------------------------------------------------------------------------------------------------
-		// △ 计算该波的僵尸总点数
+		// △ Calculate the total points of zombies in this wave
 		// ------------------------------------------------------------------------------------------------
 		int& aZombiePoints = aZombiePicker.mZombiePoints;
-		// 根据关卡计算本波的基础僵尸点数
+		// Calculate the basic zombie points for this wave based on the level
 		if (mApp->mGameMode == GameMode::GAMEMODE_CHALLENGE_LAST_STAND)
 		{
 			aZombiePoints = (mChallenge->mSurvivalStage * GetNumWavesPerSurvivalStage() + aWave + 10) * 2 / 5 + 1;
@@ -660,10 +674,11 @@ void Board::PickZombieWaves()
 		}
 		else
 		{
-			aZombiePoints = aWave / 3 + 1;
+			// Increase spawn rate
+			aZombiePoints = aWave * 2 / 3 + 1;
 		}
 
-		// 旗帜波的特殊调整
+		// Special adjustments to the banner wave
 		if (aIsFlagWave)
 		{
 			int aPlainZombiesNum = min(aZombiePoints, 8);
@@ -679,7 +694,7 @@ void Board::PickZombieWaves()
 			}
 		}
 
-		// 部分关卡的多倍出怪
+		// Multiple monster spawns in some levels
 		if (mApp->mGameMode == GameMode::GAMEMODE_CHALLENGE_COLUMN)
 		{
 			aZombiePoints *= 6;
@@ -702,9 +717,9 @@ void Board::PickZombieWaves()
 		}
 		
 		// ------------------------------------------------------------------------------------------------
-		// △ 向出怪列表中加入固定刷出的僵尸
+		// △ Added fixed zombies to the monster list
 		// ------------------------------------------------------------------------------------------------
-		// 部分新出现的僵尸会在特定波固定刷出
+		// Some new zombies will appear in certain waves.
 		if (aIntroZombieType != ZombieType::ZOMBIE_INVALID && aIntroZombieType != ZombieType::ZOMBIE_DUCKY_TUBE)
 		{
 			bool aSpawnIntro = false;
@@ -733,20 +748,20 @@ void Board::PickZombieWaves()
 			}
 		}
 
-		// 5-10 关卡的最后一波加入一只伽刚特尔
+		// A Gargantuar is added to the last wave of levels 5-10
 		if (mLevel == 50 && aIsFinalWave)
 		{
 			PutZombieInWave(ZombieType::ZOMBIE_GARGANTUAR, aWave, &aZombiePicker);
 		}
-		// 冒险模式关卡的最后一波会出现本关卡可能出现的所有僵尸
+		// The last wave of the adventure mode level will have all the zombies that may appear in this level.
 		if (mApp->IsAdventureMode() && aIsFinalWave)
 		{
 			PutInMissingZombies(aWave, &aZombiePicker);
 		}
-		// 柱子关卡的特殊出怪
+		// Special monsters in the pillar level
 		if (mApp->mGameMode == GameMode::GAMEMODE_CHALLENGE_COLUMN)
 		{
-			// 每大波的第 5 小波，固定出现 10 只扶梯僵尸
+			// In the 5th wave of each wave, 10 escalator zombies will appear.
 			if (aWave % 10 == 5)
 			{
 				for (int _i = 0; _i < 10; _i++)
@@ -755,7 +770,7 @@ void Board::PickZombieWaves()
 				}
 			}
 
-			// 每大波的第 8 小波，固定出现 10 只玩偶匣僵尸
+			// In the 8th wave of each wave, 10 Zombies will appear.
 			if (aWave % 10 == 8)
 			{
 				for (int _i = 0; _i < 10; _i++)
@@ -764,7 +779,7 @@ void Board::PickZombieWaves()
 				}
 			}
 
-			// 第 19/29 小波，固定出现 3/5 只伽刚特尔
+			// Wavelet 19/29, 3/5 Gargantuars appear regularly
 			if (aWave == 19)
 			{
 				for (int _i = 0; _i < 3; _i++)
@@ -782,7 +797,7 @@ void Board::PickZombieWaves()
 		}
 		
 		// ------------------------------------------------------------------------------------------------
-		// △ 剩余的僵尸点数用于向列表中补充随机僵尸
+		// △ The remaining zombie points are used to add random zombies to the list.
 		// ------------------------------------------------------------------------------------------------
 		while (aZombiePoints > 0 && aZombiePicker.mZombieCount < MAX_ZOMBIES_IN_WAVE)
 		{
@@ -5053,7 +5068,7 @@ void Board::SpawnZombieWave()
 			{
 				for (int i = 0; i < MAX_ZOMBIE_FOLLOWERS; i++)
 				{
-					AddZombie(ZombieType::ZOMBIE_NORMAL, mCurrentWave);  // 生成 4 只普通僵尸以代替雪橇僵尸小队
+					AddZombie(ZombieType::ZOMBIE_NORMAL, mCurrentWave); // Spawns 4 regular zombies instead of the Sled Zombie Squad
 				}
 			}
 			else
@@ -9701,6 +9716,49 @@ bool Board::PlantingRequirementsMet(SeedType theSeedType)
 	case SeedType::SEED_SPIKEROCK:			return CountPlantByType(SeedType::SEED_SPIKEWEED);
 	case SeedType::SEED_COBCANNON:			return HasValidCobCannonSpot();
 	default:								return true;
+	}
+}
+
+void Board::ApplyDamageOnZombiesInRadius(int theRow, int theX, int theY, int theRadius, int theRowRange, bool theBurn, int damage, int theDamageRangeFlags)
+{
+	Zombie *aZombie = nullptr;
+	while (IterateZombies(aZombie))
+	{
+		if (aZombie->EffectedByDamage(theDamageRangeFlags))
+		{
+			Rect aZombieRect = aZombie->GetZombieRect();
+			int aRowDist = aZombie->mRow - theRow;
+			if (aZombie->mZombieType == ZombieType::ZOMBIE_BOSS)
+			{
+				aRowDist = 0;
+			}
+
+			if (aRowDist <= theRowRange && aRowDist >= -theRowRange && GetCircleRectOverlap(theX, theY, theRadius, aZombieRect))
+			{
+				if (theBurn)
+				{
+					aZombie->ApplyBurnDamage(damage);
+				}
+				else
+				{
+					aZombie->TakeDamage(damage, 18U);
+				}
+			}
+		}
+	}
+
+	int aGridX = PixelToGridXKeepOnBoard(theX, theY);
+	int aGridY = PixelToGridYKeepOnBoard(theX, theY);
+	GridItem *aGridItem = nullptr;
+	while (IterateGridItems(aGridItem))
+	{
+		if (aGridItem->mGridItemType == GridItemType::GRIDITEM_LADDER)
+		{
+			if (GridInRange(aGridItem->mGridX, aGridItem->mGridY, aGridX, aGridY, theRowRange, theRowRange))
+			{
+				aGridItem->GridItemDie();
+			}
+		}
 	}
 }
 

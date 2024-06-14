@@ -390,6 +390,7 @@ public:
 	bool							IsValidCobCannonSpot(int theGridX, int theGridY);
 	bool							IsValidCobCannonSpotHelper(int theGridX, int theGridY);
 	void							MouseDownCobcannonFire(int x, int y, int theClickCount);
+	void							ApplyDamageOnZombiesInRadius(int theRow, int theX, int theY, int theRadius, int theRowRange, bool theBurn, int damage, int theDamageRangeFlags);
 	void							KillAllZombiesInRadius(int theRow, int theX, int theY, int theRadius, int theRowRange, bool theBurn, int theDamageRangeFlags);
 	/*inline*/ int					GetSeedBankExtraWidth();
 	bool							IsFlagWave(int theWaveNumber);
@@ -474,6 +475,8 @@ public:
 	void							DoTypingCheck(KeyCode theKey);
 	int								CountZombieByType(ZombieType theZombieType);
 	static /*inline*/ bool			IsZombieTypeSpawnedOnly(ZombieType theZombieType);
+
+	int								CountZombiesOnLine(int lineNumber);
 };
 extern bool gShownMoreSunTutorial;
 
