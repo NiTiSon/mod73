@@ -277,6 +277,7 @@ public:
     void                            UpdateClimbingLadder();
     void                            UpdateZombieGargantuar();
     int                             GetBodyDamageIndex();
+    void                            ApplyBurnDamage(int damage);
     void                            ApplyBurn();
     void                            UpdateBurn();
     bool                            ZombieNotWalking();
