@@ -23,13 +23,13 @@
 	+ Refresh time decreased: 5000 -> 4000
 	+ Explosion damage decreased: 1800 -> 1200
 
-## Zombie
+## Zombie:
 + Zombie with Flag
 	+ Increase health: 270 -> 2000
 + Default zombie
 	+ Health increase: 270 -> 300
 
-## Gameplay
+## Gameplay:
 + Spawn
 	+ Increase spawn rate: \~2 times
 + Zombie
