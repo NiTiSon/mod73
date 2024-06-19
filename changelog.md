@@ -1,5 +1,12 @@
 # 0.0.2 Changes:
 
+## Plants:
++ Sunflower
+	+ Now only drops additional sun when eaten by zombie
+	+ Chance to drop big sun: 1/8 -> 1/64
++ Peashooter
+	+ Cost increased: 75 -> 100
+
 ## Gameplay
 + Seed Bank
 	+ QoL: By pressing keys 1..9 you can select plants from seed bank
@@ -11,12 +18,12 @@
 	+ Cost increased: 50 -> 75
 	+ Drops sun when eaten: 25
 	+ Apply 20 damage on zombie that ate sunflower
-	+ Has 12.5% chance to drop 50 sun instead 25
+	+ Has 1/8 (12.5%) chance to drop 50 sun instead 25
 + Peashooter
 	+ Cost decreased: 100 -> 75
 	+ Increase shoot speed by 75% when there are 3 or more zombies on line
 + Chomper
-	+ Eat time decrease: 4000 -> 2000
+	+ Chewing time decrease: 4000 -> 2000
 	+ Cost increased: 150 -> 175
 + Potatomine
 	+ Cost increased: 25 -> 75
