@@ -22,7 +22,7 @@
 #include "../Sexy.TodLib/TodStringFile.h"
 
 PlantDefinition gPlantDefs[SeedType::NUM_SEED_TYPES] = {  //0x69F2B0
-    { SeedType::SEED_PEASHOOTER,        nullptr, ReanimationType::REANIM_PEASHOOTER,    0,  75,     750,    PlantSubClass::SUBCLASS_SHOOTER,    150,    _S("PEASHOOTER") },
+    { SeedType::SEED_PEASHOOTER,        nullptr, ReanimationType::REANIM_PEASHOOTER,    0,  100,    750,    PlantSubClass::SUBCLASS_SHOOTER,    150,    _S("PEASHOOTER") },
     { SeedType::SEED_SUNFLOWER,         nullptr, ReanimationType::REANIM_SUNFLOWER,     1,  75,     750,    PlantSubClass::SUBCLASS_NORMAL,     2500,   _S("SUNFLOWER") },
     { SeedType::SEED_CHERRYBOMB,        nullptr, ReanimationType::REANIM_CHERRYBOMB,    3,  325,    4000,   PlantSubClass::SUBCLASS_NORMAL,     0,      _S("CHERRY_BOMB") },
     { SeedType::SEED_WALLNUT,           nullptr, ReanimationType::REANIM_WALLNUT,       2,  50,     3000,   PlantSubClass::SUBCLASS_NORMAL,     0,      _S("WALL_NUT") },
@@ -1047,7 +1047,7 @@ void Plant::UpdateProductionPlant()
         }
         else if (mSeedType == SeedType::SEED_SUNFLOWER)
         {
-            int aRandom = RandRangeInt(1, 8); // 12.5% to drop 50 sun instead of 25
+            int aRandom = RandRangeInt(1, 64); // 1.5% to drop 50 sun instead of 25
             CoinType aCoinType;
             if (aRandom == 1)
                 aCoinType = CoinType::COIN_LARGESUN;
@@ -5011,9 +5011,8 @@ void Plant::Die()
         if (aZombie)
         {
             aZombie->TakeDamage(20, 0); // Applies damage to zombie that ate sunflower
+            mBoard->AddCoin(this->mX, this->mY, CoinType::COIN_SUN, CoinMotion::COIN_MOTION_FROM_PLANT); // Drops sun on death
         }
-
-        mBoard->AddCoin(this->mX, this->mY, CoinType::COIN_SUN, CoinMotion::COIN_MOTION_FROM_PLANT); // Drops sun on death
     }
 
     mDead = true;
