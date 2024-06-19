@@ -8202,12 +8202,17 @@ void Board::KeyChar(SexyChar theChar)
 	if (theChar >= _S('1') && theChar <= _S('9'))
 	{
 		int aIndex = theChar - _S('1');
-		if (mSeedBank->mSeedPackets[aIndex].CanPickUp())
+
+		SeedPacket &packet = mSeedBank->mSeedPackets[aIndex];
+		if (packet.CanPickUp())
 		{
-			mCursorObject->mType = mSeedBank->mSeedPackets[aIndex].mPacketType;
-			mCursorObject->mImitaterType = mSeedBank->mSeedPackets[aIndex].mPacketType;
+			mCursorObject->mType = packet.mPacketType;
+			mCursorObject->mImitaterType = packet.mImitaterType;
 			mCursorObject->mCursorType = CursorType::CURSOR_TYPE_PLANT_FROM_BANK;
-			mCursorObject->mSeedBankIndex = mSeedBank->mSeedPackets[aIndex].mIndex;
+			mCursorObject->mSeedBankIndex = packet.mIndex;
+			mApp->PlaySample(SOUND_SEEDLIFT);
+
+			packet.Deactivate();
 		}
 	}
 }
