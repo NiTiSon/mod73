@@ -377,6 +377,10 @@ void Coin::CoinInitialize(int theX, int theY, CoinType theCoinType, CoinMotion t
     {
         aScale = 0.5f;
     }
+    else if (mType == CoinType::COIN_MEDIUMSUN)
+    {
+        aScale = 1.5f;
+    }
     else if (mType == CoinType::COIN_LARGESUN)
     {
         aScale = 2.0f;
@@ -413,7 +417,7 @@ bool Coin::IsMoney()
 //0x430990
 bool Coin::IsSun()
 {
-    return mType == CoinType::COIN_SUN || mType == CoinType::COIN_SMALLSUN || mType == CoinType::COIN_LARGESUN;
+    return mType == CoinType::COIN_SUN || mType == CoinType::COIN_SMALLSUN || mType == CoinType::COIN_MEDIUMSUN || mType == CoinType::COIN_LARGESUN;
 }
 
 //0x4309B0
@@ -1280,13 +1284,47 @@ void Coin::Collect()
 
 float Coin::GetSunScale()
 {
-    return mType == CoinType::COIN_SMALLSUN ? 0.5f : mType == CoinType::COIN_LARGESUN ? 1.75f : 1.0f;
+    float aScale = 0.5f;
+
+    if (mType == CoinType::COIN_SMALLSUN)
+    {
+        aScale = 0.5f;
+    }
+    else if (mType == CoinType::COIN_SUN)
+    {
+        aScale = 1.0f;
+    }
+    else if (mType == CoinType::COIN_MEDIUMSUN)
+    {
+        aScale = 1.5f;
+    }
+    else if (mType == CoinType::COIN_LARGESUN)
+    {
+        aScale = 1.75f;
+    }
+
+    return aScale;
 }
 
 //0x4329A0
 int Coin::GetSunValue()
 {
-    return mType == CoinType::COIN_SUN ? 25 : mType == CoinType::COIN_SMALLSUN ? 15 : mType == CoinType::COIN_LARGESUN ? 50 : 0;
+    int aSunValue = 25;
+
+    if (mType == COIN_SMALLSUN)
+    {
+        aSunValue = 15;
+    }
+    else if (mType == COIN_MEDIUMSUN)
+    {
+        aSunValue = 35;
+    }
+    else if (mType == COIN_LARGESUN)
+    {
+        aSunValue = 50;
+    }
+
+    return aSunValue;
 }
 
 //0x4329D0

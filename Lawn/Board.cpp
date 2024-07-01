@@ -8206,6 +8206,15 @@ void Board::KeyChar(SexyChar theChar)
 		SeedPacket &packet = mSeedBank->mSeedPackets[aIndex];
 		if (packet.CanPickUp())
 		{
+			// When other plant is choosen
+			// FIX: https://github.com/NiTiSon/mod73/issues/1
+			if (mCursorObject->mCursorType == CursorType::CURSOR_TYPE_PLANT_FROM_BANK)
+			{
+				SeedPacket &previousPacket = mSeedBank->mSeedPackets[mCursorObject->mSeedBankIndex];
+
+				previousPacket.Activate();
+			}
+
 			mCursorObject->mType = packet.mPacketType;
 			mCursorObject->mImitaterType = packet.mImitaterType;
 			mCursorObject->mCursorType = CursorType::CURSOR_TYPE_PLANT_FROM_BANK;
@@ -8214,6 +8223,11 @@ void Board::KeyChar(SexyChar theChar)
 
 			packet.Deactivate();
 		}
+	}
+
+	if (theChar == _S('`'))
+	{
+		PickUpTool(GameObjectType::OBJECT_TYPE_SHOVEL);
 	}
 }
 

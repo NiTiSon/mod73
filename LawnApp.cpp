@@ -115,7 +115,7 @@ LawnApp::LawnApp()
 	mAutoStartLoadingThread = false;
 	mDebugKeysEnabled = false;
 	mProdName = "PlantsVsZombies";
-	std::string aTitleName = "PvZ mod73 v0.0.1";
+	std::string aTitleName = "PvZ mod73 v0.0.2";
 #ifdef _DEBUG
 	aTitleName += " BETA ";
 	aTitleName += mProductVersion;

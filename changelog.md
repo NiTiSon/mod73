@@ -7,9 +7,18 @@
 + Peashooter
 	+ Cost increased: 75 -> 100
 
++ Sunshroom
+	+ When grown drops 35 sun instead of 25
+
++ Gravebuster
+	+ Cost decrease 75 -> 25
+
 ## Gameplay
 + Seed Bank
 	+ QoL: By pressing keys 1..9 you can select plants from seed bank
+
+## Bugfixes
++ https://github.com/NiTiSon/mod73/issues/1
 
 # 0.0.1 Changes:
 
